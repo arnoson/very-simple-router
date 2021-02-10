@@ -6,6 +6,7 @@
   "types": "./types/index.d.ts",
   "scripts": {
     "build": "rollup --config && npm run generate-types",
+    "publish": "npm run build && np --no-2fa",
     "generate-types": "tsc src/index.js --declaration --allowJs --emitDeclarationOnly --outDir types",
     "test": "jest"
   },
