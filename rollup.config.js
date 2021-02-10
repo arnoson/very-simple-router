@@ -15,6 +15,17 @@ export default [
   {
     input: 'src/index.js',
     output: {
+      file: 'dist/index.js',
+      format: 'cjs',
+      name: 'Router',
+      exports: 'default',
+      sourcemap: true
+    },
+    plugins: [babel({ babelHelpers: 'bundled' }), terser()]
+  },
+  {
+    input: 'src/index.js',
+    output: {
       file: 'dist/index.esm.js',
       format: 'es',
       name: 'Router',
