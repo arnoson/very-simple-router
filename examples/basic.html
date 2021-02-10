@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="shortcut icon" href="#" />
+    <title>Very Tiny Router (basic)</title>
+  </head>
+  <body>
+    <a href="/">Home</a> | <a href="/some-path">Some path</a> |
+    <a href="/hello/world">Hello world!</a> |
+    <a href="/somepath">404 - Not found</a>
+
+    <!-- Here we will insert the content when the route changes. -->
+    <h1>Click one of the links above</h1>
+
+    <script type="module">
+      import Router from '../src/index.js'
+      const router = new Router()
+
+      router.route('/', () => setContent('Home'))
+      router.route('/some-path', () => setContent('Some path'))
+      router.route('/hello/:name', ({ name }) => setContent(`Hello ${name}!`))
+      router.route('*', () => setContent('404 - Not found'))
+
+      const setContent = text => (document.querySelector('h1').innerHTML = text)
+
+      // Prevent links from actually changing the page and push a new route
+      // instead.
+      document.querySelectorAll('a').forEach(el =>
+        el.addEventListener('click', event => {
+          event.preventDefault()
+          router.push(el.getAttribute('href'))
+        })
+      )
+    </script>
+  </body>
+</html>
