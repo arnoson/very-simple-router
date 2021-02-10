@@ -5,7 +5,7 @@ export default [
   {
     input: 'src/index.js',
     output: {
-      file: 'dist/index.legacy.js',
+      file: 'dist/index.iife.js',
       format: 'iife',
       name: 'Router',
       sourcemap: true
@@ -15,7 +15,7 @@ export default [
   {
     input: 'src/index.js',
     output: {
-      file: 'dist/index.js',
+      file: 'dist/index.esm.js',
       format: 'es',
       name: 'Router',
       sourcemap: true
