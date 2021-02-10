@@ -34,6 +34,8 @@ or a javascript module:
 ### Create a new router and add routes:
 
 ```js
+import Router from 'very-tiny-router'
+
 const router = new Router()
 router.route('/', () => console.log('Home'))
 router.route('/about', () => console.log('About'))
