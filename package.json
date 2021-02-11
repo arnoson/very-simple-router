@@ -7,12 +7,21 @@
   "types": "./types/index.d.ts",
   "scripts": {
     "build": "rollup --config && npm run generate-types",
-    "publish": "npm run build && np --no-2fa",
+    "publish-package": "npm run build && np --no-2fa",
     "generate-types": "tsc src/index.js --declaration --allowJs --emitDeclarationOnly --outDir types",
     "test": "jest"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "arnoson",
+  "license": "MIT",
+  "keywords": [
+    "router",
+    "tiny",
+    "small",
+    "es6",
+    "esnext",
+    "vanilla",
+    "SPA"
+  ],
   "devDependencies": {
     "@babel/core": "^7.12.13",
     "@babel/preset-env": "^7.12.13",
