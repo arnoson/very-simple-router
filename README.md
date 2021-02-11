@@ -50,16 +50,16 @@ router.push(window.location.pathname)
 ### Handle link navigation:
 
 ```html
-<a href="/">Home</a>
-<a href="/about">About</a>
-<a href="/projects/test">This one project</a>
+<a class="router-link" href="/">Home</a>
+<a class="router-link" href="/about">About</a>
+<a class="router-link" href="/projects/test">This one project</a>
 ```
 
 To prevent the links from actually changing the page we have to intercept the
 click events and push/replace a route instead.
 
 ```js
-document.querySelectorAll('a').forEach(el =>
+document.querySelectorAll('a.router-link').forEach(el =>
   el.addEventListener('click', event => {
     event.preventDefault()
     router.push(el.getAttribute('href'))
