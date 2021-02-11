@@ -12,7 +12,7 @@ lightweight SPAs or enhance your traditional multi page websites.
 ### manual
 
 You can also include `very-tiny-router` directly in the browser. Download this
-repository and place it in the root folder of your website. Than you can either
+repository and place it in the root folder of your website. Then you can either
 use a iife:
 
 ```html
@@ -42,6 +42,9 @@ router.route('/', () => console.log('Home'))
 router.route('/about', () => console.log('About'))
 router.route('/projects/:id', ({ id }) => console.log(`Show project ${id}`))
 router.route('*', () => console.log('Not found!'))
+
+// In most cases, you probably want the router to handle the initial route.
+router.push(window.location.pathname)
 ```
 
 ### Handle link navigation:
@@ -121,8 +124,10 @@ You can also use the current route anywhere in your project:
 // router.js
 import Router from 'very-tiny-router'
 export default const router = new Router({
-  routes: { path: '/', () => { /* ... */ } }
-  routes: { path: '/user/:name', () => { /* ... */ } }
+  routes: [
+    { path: '/', () => { /* ... */ } },
+    { path: '/user/:name', () => { /* ... */ } }
+  ]
 })
 ```
 
