@@ -5,11 +5,11 @@ lightweight SPAs or enhance your traditional multi page websites.
 
 ## Installation
 
-### npm
+### Npm
 
 `npm install very-tiny-router`
 
-### manual
+### Manual
 
 You can also include `very-tiny-router` directly in the browser. Download this
 repository and place it in the root folder of your website. Then you can either
@@ -32,7 +32,7 @@ or a javascript module:
 
 ## Usage
 
-### Create a new router and add routes:
+### Create a new Router and add Routes:
 
 ```js
 import Router from 'very-tiny-router'
@@ -47,7 +47,7 @@ router.route('*', () => console.log('Not found!'))
 router.push(window.location.pathname)
 ```
 
-### Handle link navigation:
+### Handle Link Navigation:
 
 ```html
 <a class="router-link" href="/">Home</a>
@@ -84,19 +84,19 @@ const router = new Router({
 })
 ```
 
-### Push a new route
+### Push a new Route
 
 ```js
 router.push('/path/to/something')
 ```
 
-### Replace the current route with a new one
+### Replace the current Route
 
 ```js
 router.replace('/path/to/something')
 ```
 
-### Add a new route
+### Add a new Route
 
 ```js
 router.route('/path', () => {
@@ -104,7 +104,7 @@ router.route('/path', () => {
 })
 ```
 
-### Add a new dynamic route
+### Add a new Dynamic Route
 
 You can use one or more dynamic segments (denoted by a colon `:`). The dynamic
 segments will then be available in the route's action callback.
@@ -116,7 +116,7 @@ const action = params => {
 router.route('/user/:firstName/:lastName', action)
 ```
 
-### Use the current route
+### Use the current Route
 
 You can also use the current route anywhere in your project:
 
