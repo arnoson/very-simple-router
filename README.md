@@ -1,16 +1,17 @@
 # Very Tiny Router
 
-A simple and tiny vanilla js router written in modern javascript.
+A simple vanilla js router written in modern javascript. You can use it to build
+lightweight SPAs or enhance your traditional multi page websites.
 
 ## Installation
 
-### NPM
+### npm
 
 `npm install very-tiny-router`
 
 ### manual
 
-You can also include very-tiny-router directly in the browser. Download this
+You can also include `very-tiny-router` directly in the browser. Download this
 repository and place it in the root folder of your website. Than you can either
 use a iife:
 
@@ -63,9 +64,93 @@ document.querySelectorAll('a').forEach(el =>
 )
 ```
 
+## Documentation
+
+### Configuration
+
+You can define the routes directly when creating the router (or use the
+[`route()`](#add-a-new-route) method) and set the history scrollRestoration.
+
+```js
+const router = new Router({
+  routes: [
+    { path: '/', action: () => console.log('Home') },
+    { path: '/user/:name', action: ({ name }) => console.log(`Hello ${id}!`) }
+  ],
+  scrollRestoration: 'auto' // default is 'manual'
+})
+```
+
+### Push a new route
+
+```js
+router.push('/path/to/something')
+```
+
+### Replace the current route with a new one
+
+```js
+router.replace('/path/to/something')
+```
+
+### Add a new route
+
+```js
+router.route('/path', () => {
+  // Do something ...
+})
+```
+
+### Add a new dynamic route
+
+You can use one or more dynamic segments (denoted by a colon `:`). The dynamic
+segments will then be available in the route's action callback.
+
+```js
+const action = params => {
+  console.log(`Hello ${params.firstName} ${params.firstName}!`)
+}
+router.route('/user/:firstName/:lastName', action)
+```
+
+### Use the current route
+
+You can also use the current route anywhere in your project:
+
+```js
+// router.js
+import Router from 'very-tiny-router'
+export default const router = new Router({
+  routes: { path: '/', () => { /* ... */ } }
+  routes: { path: '/user/:name', () => { /* ... */ } }
+})
+```
+
+```js
+// another-file.js
+import router from './router.js'
+
+window.addEventListener('click', () => {
+  if (router.currentRoute.path === '/') {
+    console.log('Welcome home!')
+  } else {
+    console.log(`Welcome ${router.params.name}`)
+  }
+})
+```
+
+### Catch all / 404 Not found Route
+
+You can use the asterisk `*` to match any route that is not matched by a
+previous route. See [important](#important) for the asterisk's limitations.
+
+```js
+router.route('*', () => console.log('Not found!'))
+```
+
 ## Important
 
 - `very-tiny-router` uses HTML5 history mode only, so make sure your server is
   setup correctly (see vue router's [explanation](https://router.vuejs.org/guide/essentials/history-mode.html#example-server-configurations)).
-- The wildcard `*` can be only used to catch all routes. It is not possible to
+- The asterisk `*` can only be used to catch all routes. It is not possible to
   use it like this `'/user-*'`.
