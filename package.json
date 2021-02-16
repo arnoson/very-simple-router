@@ -5,6 +5,10 @@
   "main": "./dist/index.js",
   "module": "./src/index.js",
   "types": "./types/index.d.ts",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/arnoson/very-tiny-router.git"
+  },
   "scripts": {
     "build": "rollup --config && npm run generate-types",
     "publish-package": "npm run build && np --no-2fa",
