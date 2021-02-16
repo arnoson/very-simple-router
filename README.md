@@ -111,7 +111,7 @@ segments will then be available in the route's action callback.
 
 ```js
 const action = params => {
-  console.log(`Hello ${params.firstName} ${params.firstName}!`)
+  console.log(`Hello ${params.firstName} ${params.lastName}!`)
 }
 router.route('/user/:firstName/:lastName', action)
 ```
@@ -139,7 +139,7 @@ window.addEventListener('click', () => {
   if (router.currentRoute.path === '/') {
     console.log('Welcome home!')
   } else {
-    console.log(`Welcome ${router.params.name}`)
+    console.log(`Welcome ${router.currentRoute.params.name}`)
   }
 })
 ```
