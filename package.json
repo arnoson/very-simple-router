@@ -1,6 +1,6 @@
 {
   "name": "very-tiny-router",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "A tiny vanilla js router",
   "main": "./dist/index.js",
   "module": "./src/index.js",
