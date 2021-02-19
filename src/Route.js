@@ -5,7 +5,7 @@ import { stripTrailingSlash } from './utils.js'
  */
 
 /**
- * @typedef {(params: RouteParams) => any} RouteAction
+ * @typedef {(params: RouteParams, initial?: boolean) => any} RouteAction
  */
 
 /**

@@ -44,7 +44,7 @@ router.route('/projects/:id', ({ id }) => console.log(`Show project ${id}`))
 router.route('*', () => console.log('Not found!'))
 
 // In most cases, you probably want the router to handle the initial route.
-router.push(window.location.pathname)
+router.init()
 ```
 
 ### Handle Link Navigation:
@@ -114,6 +114,29 @@ const action = params => {
   console.log(`Hello ${params.firstName} ${params.lastName}!`)
 }
 router.route('/user/:firstName/:lastName', action)
+```
+
+### Handle initial route
+
+In most cases you probably want the router to handle the initial route:
+
+```js
+const router = new Router()
+router.route('*', () => console.log('hello world!'))
+// This will call the route immediately:
+router.init()
+```
+
+In some cases you may want to handle the initial route differently (e.g.: no
+smooth scrolling):
+
+```js
+const router = new Router()
+router.route('projects/:id', (params, initial) => {
+  const el = document.getElementById(params.id)
+  el.scrollIntoView({ behavior: initial ? 'auto' : 'smooth' })
+})
+router.init()
 ```
 
 ### Use the current Route

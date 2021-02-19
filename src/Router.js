@@ -47,18 +47,23 @@ export class Router {
     this._handleChange(path)
   }
 
+  init() {
+    this._handleChange(window.location.pathname, true)
+  }
+
   /**
    * Search for the first route that matches the path and call the routes
    * callback.
    * @private
    * @param {string} path
+   * @param {boolean} initial
    */
-  _handleChange(path) {
+  _handleChange(path, initial = false) {
     for (const route of this.routes) {
       const params = route.match(path)
       if (params) {
         this.currentRoute = { path, params }
-        route.action(params)
+        route.action(params, initial)
         break
       }
     }

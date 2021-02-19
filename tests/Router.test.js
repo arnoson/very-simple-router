@@ -24,6 +24,14 @@ describe('Router', () => {
     expect(createdRoute).toMatchObject({ path, action })
   })
 
+  it('handles the initial route', () => {
+    const router = new Router()
+    const action = jest.fn()
+    router.route('/', action)
+    router.init()
+    expect(action).toBeCalledWith({}, true)
+  })
+
   it('pushes a new route', () => {
     const router = new Router()
     window.history.pushState = jest.fn()
@@ -55,7 +63,7 @@ describe('Router', () => {
     router.route('/path/:param', action)
 
     navigateToPath('/path/test')
-    expect(action).toBeCalledWith({ param: 'test' })
+    expect(action).toBeCalledWith({ param: 'test' }, false)
   })
 
   it('catches unresolved routes', () => {
