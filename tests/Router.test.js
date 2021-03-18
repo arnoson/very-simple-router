@@ -75,4 +75,19 @@ describe('Router', () => {
     navigateToPath('/does-not-exist')
     expect(action).toBeCalled()
   })
+
+  it('calls hooks before and after each route', () => {
+    const router = new Router()
+    router.route('/', () => {})
+
+    const callbackBefore = jest.fn()
+    const callbackAfter = jest.fn()
+    router.beforeEach(callbackBefore)
+    router.afterEach(callbackAfter)
+
+    navigateToPath('/')
+    const route = { path: '/', params: {}, pattern: '/' }
+    expect(callbackBefore).toBeCalledWith(route)
+    expect(callbackAfter).toBeCalledWith(route)
+  })
 })

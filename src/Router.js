@@ -1,6 +1,8 @@
 import { stripTrailingSlash } from './utils.js'
 import { Route } from './Route.js'
 
+/** @typedef {{ path: string, pattern: string, params: object }} RouteObject */
+
 export class Router {
   /**
    * @param {{ routes?: Array, scrollRestoration?: ScrollRestoration }} [options]
@@ -9,8 +11,11 @@ export class Router {
   constructor({ routes = [], scrollRestoration = 'manual' } = {}) {
     /** @type {Array<Route>} */
     this.routes = []
-    /** @type {{ path: string, params: object }} */
+    /** @type {RouteObject} */
     this.currentRoute = null
+
+    this._handleBeforeEach = null
+    this._handleAfterEach = null
 
     routes.forEach(({ path, action }) => this.route(path, action))
     window.history.scrollRestoration = scrollRestoration
@@ -52,6 +57,20 @@ export class Router {
   }
 
   /**
+   * @param {(route: RouteObject) => any?} callback
+   */
+  beforeEach(callback) {
+    this._handleBeforeEach = callback
+  }
+
+  /**
+   * @param {(route: RouteObject) => any?} callback
+   */
+  afterEach(callback) {
+    this._handleAfterEach = callback
+  }
+
+  /**
    * Search for the first route that matches the path and call the routes
    * callback.
    * @private
@@ -62,8 +81,17 @@ export class Router {
     for (const route of this.routes) {
       const params = route.match(path)
       if (params) {
-        this.currentRoute = { path, params }
-        route.action(params, initial)
+        const { pattern } = route
+        this.currentRoute = { path, pattern, params }
+
+        this._handleBeforeEach?.(this.currentRoute)
+
+        const result = route.action(params, initial)
+        if (result instanceof Promise) {
+          result.then(() => this._handleAfterEach?.(this.currentRoute))
+        } else {
+          this._handleAfterEach?.(this.currentRoute)
+        }
         break
       }
     }

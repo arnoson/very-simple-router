@@ -176,6 +176,15 @@ previous route. See [important](#important) for the asterisk's limitations.
 router.route('*', () => console.log('Not found!'))
 ```
 
+### Hooks
+
+Execute a callback before or after each route. This are simple hooks, no navigation guards. So you can't use them to redirect or cancel routes. The callbacks receive a route object as an argument containing the `path`, `pattern` and `params`.
+
+```js
+router.beforeEach(route => console.log(`Changing to path: ${route.path}`))
+router.afterEach(route => console.log(`Changed to path: ${route.path}`))
+```
+
 ## Important
 
 - `very-tiny-router` uses HTML5 history mode only, so make sure your server is

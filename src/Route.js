@@ -20,6 +20,7 @@ export class Route {
     path = stripTrailingSlash(path)
 
     this.path = path
+    this.pattern = path
     this.action = action
     this.catchAll = path === '*'
 
