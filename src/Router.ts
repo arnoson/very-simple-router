@@ -5,6 +5,7 @@ export interface RouteObject {
   path: string
   pattern: string
   params: RouteParams
+  matched: boolean
 }
 
 export interface RouteDefinition {
@@ -17,12 +18,22 @@ export interface RouterOptions {
   scrollRestoration?: ScrollRestoration
 }
 
+export type BeforeEachHandler = (
+  to: RouteObject,
+  from: RouteObject
+) => any | Promise<any>
+
+export type AfterEachHandler = (
+  to: RouteObject,
+  from: RouteObject
+) => any | Promise<any>
+
 export class Router {
   routes: Route[] = []
   currentRoute: RouteObject
 
-  private _handleBeforeEach: (route: RouteObject) => any
-  private _handleAfterEach: (route: RouteObject) => any
+  private _beforeEachHandlers = [] as BeforeEachHandler[]
+  private _afterEachHandlers = [] as AfterEachHandler[]
 
   constructor({
     routes = [],
@@ -65,35 +76,49 @@ export class Router {
     this._handleChange(window.location.pathname, true)
   }
 
-  beforeEach(callback: (route: RouteObject) => any) {
-    this._handleBeforeEach = callback
+  beforeEach(handler: BeforeEachHandler) {
+    this._beforeEachHandlers.push(handler)
   }
 
-  afterEach(callback: (route: RouteObject) => any) {
-    this._handleAfterEach = callback
+  afterEach(handler: AfterEachHandler) {
+    this._afterEachHandlers.push(handler)
+  }
+
+  use(middleware: { init?: () => any; beforeEach: BeforeEachHandler }) {
+    middleware.init?.()
+    this.beforeEach(middleware.beforeEach)
+  }
+
+  private _findRoute(path: string) {
+    for (const route of this.routes) {
+      const params = route.match(path)
+      if (params) return { route, params }
+    }
   }
 
   /**
    * Search for the first route that matches the path and call the routes
    * callback.
    */
-  private _handleChange(path: string, initial = false) {
-    for (const route of this.routes) {
-      const params = route.match(path)
-      if (params) {
-        const { pattern } = route
-        this.currentRoute = { path, pattern, params }
+  private async _handleChange(path: string, initial = false) {
+    const { route, params } = this._findRoute(path) ?? {}
 
-        this._handleBeforeEach?.(this.currentRoute)
+    const previousRoute = this.currentRoute
+    this.currentRoute = {
+      path,
+      params,
+      pattern: route?.pattern,
+      matched: !!route,
+    }
 
-        const result = route.action(params, initial)
-        if (result instanceof Promise) {
-          result.then(() => this._handleAfterEach?.(this.currentRoute))
-        } else {
-          this._handleAfterEach?.(this.currentRoute)
-        }
-        break
-      }
+    for (const handler of this._beforeEachHandlers) {
+      await handler(this.currentRoute, previousRoute)
+    }
+
+    await route?.action(params, initial)
+
+    for (const handler of this._afterEachHandlers) {
+      await handler(this.currentRoute, previousRoute)
     }
   }
 }

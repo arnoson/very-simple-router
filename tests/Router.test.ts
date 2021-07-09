@@ -1,6 +1,8 @@
 import { Router } from '../src/Router'
 import { Route } from '../src/Route'
 
+const flushPromises = () => new Promise(setImmediate)
+
 const navigateToPath = (path) => {
   Object.defineProperty(window, 'location', {
     value: { pathname: path },
@@ -76,18 +78,46 @@ describe('Router', () => {
     expect(action).toBeCalled()
   })
 
-  it('calls hooks before and after each route', () => {
+  it('calls hooks before each route', () => {
     const router = new Router()
     router.route('/', () => {})
 
-    const callbackBefore = jest.fn()
-    const callbackAfter = jest.fn()
-    router.beforeEach(callbackBefore)
-    router.afterEach(callbackAfter)
+    const callback = jest.fn()
+    router.beforeEach(callback)
 
     navigateToPath('/')
-    const route = { path: '/', params: {}, pattern: '/' }
-    expect(callbackBefore).toBeCalledWith(route)
-    expect(callbackAfter).toBeCalledWith(route)
+    const route = { path: '/', params: {}, pattern: '/', matched: true }
+    expect(callback).toBeCalledWith(route, undefined)
+  })
+
+  it('calls hooks after each route', async () => {
+    const router = new Router()
+    router.route('/', () => {})
+
+    const callback = jest.fn()
+    router.afterEach(callback)
+
+    navigateToPath('/')
+
+    // The route action can be async (even if it isn't in this case). Therefore
+    // we have to flush all promises before testing.
+    await flushPromises()
+
+    const route = { path: '/', params: {}, pattern: '/', matched: true }
+    expect(callback).toBeCalledWith(route, undefined)
+  })
+
+  it('uses middleware', () => {
+    const router = new Router()
+    router.route('/', () => {})
+
+    const middleware = { init: jest.fn(), beforeEach: jest.fn() }
+    router.use(middleware)
+    expect(middleware.init).toBeCalled()
+
+    navigateToPath('/')
+    const from = undefined
+    const to = { path: '/', params: {}, pattern: '/', matched: true }
+    expect(middleware.beforeEach).toBeCalledWith(to, from)
   })
 })
