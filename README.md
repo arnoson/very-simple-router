@@ -1,4 +1,4 @@
-# Very Tiny Router
+# Very Simple Router
 
 A simple vanilla js router written in modern javascript. You can use it to build
 lightweight SPAs or enhance your traditional multi page websites.
@@ -7,16 +7,16 @@ lightweight SPAs or enhance your traditional multi page websites.
 
 ### Npm
 
-`npm install very-tiny-router`
+`npm install very-simple-router`
 
 ### Manual
 
-You can also include `very-tiny-router` directly in the browser. Download this
+You can also include `very-simple-router` directly in the browser. Download this
 repository and place it in the root folder of your website. Then you can either
 use a iife:
 
 ```html
-<script src="./very-tiny-router/dist/index.iife.js"></script>
+<script src="./very-simple-router/dist/index.iife.js"></script>
 <script>
   const router = new Router()
 </script>
@@ -26,7 +26,7 @@ or a javascript module:
 
 ```html
 <script type="module">
-  import Router from './very-tiny-router/dist/index.esm.js'
+  import Router from './very-simple-router/dist/index.esm.js'
 </script>
 ```
 
@@ -35,7 +35,7 @@ or a javascript module:
 ### Create a new Router and add Routes:
 
 ```js
-import Router from 'very-tiny-router'
+import Router from 'very-simple-router'
 
 const router = new Router()
 router.route('/', () => console.log('Home'))
@@ -145,7 +145,7 @@ You can also use the current route anywhere in your project:
 
 ```js
 // router.js
-import Router from 'very-tiny-router'
+import Router from 'very-simple-router'
 export default const router = new Router({
   routes: [
     { path: '/', () => { /* ... */ } },
@@ -187,7 +187,7 @@ router.afterEach(route => console.log(`Changed to path: ${route.path}`))
 
 ## Important
 
-- `very-tiny-router` uses HTML5 history mode only, so make sure your server is
+- `very-simple-router` uses HTML5 history mode only, so make sure your server is
   setup correctly (see vue router's [explanation](https://router.vuejs.org/guide/essentials/history-mode.html#example-server-configurations)).
 - The asterisk `*` can only be used to catch all routes. It is not possible to
   use it like this `'/user-*'`.

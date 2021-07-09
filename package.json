@@ -1,13 +1,13 @@
 {
-  "name": "very-tiny-router",
+  "name": "very-simple-router",
   "version": "1.1.0",
-  "description": "A tiny vanilla js router",
+  "description": "A very simple vanilla js router",
   "main": "./dist/index.js",
   "module": "./src/index.js",
   "types": "./types/index.d.ts",
   "repository": {
     "type": "git",
-    "url": "https://github.com/arnoson/very-tiny-router.git"
+    "url": "https://github.com/very-simple/router.git"
   },
   "scripts": {
     "build": "rollup --config && npm run generate-types",
@@ -18,6 +18,8 @@
   "author": "arnoson",
   "license": "MIT",
   "keywords": [
+    "very",
+    "simple",
     "router",
     "tiny",
     "small",
