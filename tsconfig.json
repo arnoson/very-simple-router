@@ -1,6 +1,5 @@
 {
   "compilerOptions": {
-    "checkJs": true,
     "lib": ["es6", "dom"]
   },
   "typeAcquisition": {

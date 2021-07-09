@@ -1,10 +1,10 @@
-import { Router } from '../src/Router.js'
-import { Route } from '../src/Route.js'
+import { Router } from '../src/Router'
+import { Route } from '../src/Route'
 
-const navigateToPath = path => {
+const navigateToPath = (path) => {
   Object.defineProperty(window, 'location', {
     value: { pathname: path },
-    writable: true
+    writable: true,
   })
   window.dispatchEvent(new PopStateEvent('popstate'))
 }
@@ -15,7 +15,7 @@ describe('Router', () => {
     const action = () => {}
     const router = new Router({
       routes: [{ path, action }],
-      scrollRestoration: 'manual'
+      scrollRestoration: 'manual',
     })
 
     expect(window.history.scrollRestoration).toBe('manual')

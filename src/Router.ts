@@ -1,22 +1,33 @@
-import { stripTrailingSlash } from './utils.js'
-import { Route } from './Route.js'
+import { stripTrailingSlash } from './utils'
+import { Route, RouteAction, RouteParams } from './Route'
 
-/** @typedef {{ path: string, pattern: string, params: object }} RouteObject */
+export interface RouteObject {
+  path: string
+  pattern: string
+  params: RouteParams
+}
+
+export interface RouteDefinition {
+  path: string
+  action: RouteAction
+}
+
+export interface RouterOptions {
+  routes?: RouteDefinition[]
+  scrollRestoration?: ScrollRestoration
+}
 
 export class Router {
-  /**
-   * @param {{ routes?: Array, scrollRestoration?: ScrollRestoration }} [options]
-   */
-  // @ts-ignore (typescript doesn't seem to like the empty `{}`)
-  constructor({ routes = [], scrollRestoration = 'manual' } = {}) {
-    /** @type {Array<Route>} */
-    this.routes = []
-    /** @type {RouteObject} */
-    this.currentRoute = null
+  routes: Route[] = []
+  currentRoute: RouteObject
 
-    this._handleBeforeEach = null
-    this._handleAfterEach = null
+  private _handleBeforeEach: (route: RouteObject) => any
+  private _handleAfterEach: (route: RouteObject) => any
 
+  constructor({
+    routes = [],
+    scrollRestoration = 'manual',
+  }: RouterOptions = {}) {
     routes.forEach(({ path, action }) => this.route(path, action))
     window.history.scrollRestoration = scrollRestoration
     window.addEventListener('popstate', () =>
@@ -26,28 +37,26 @@ export class Router {
 
   /**
    * Add a new route.
-   * @param {string} path - A path or a pattern (e.g.: `/user/:id`).
-   * @param {import("./Route").RouteAction} action A function that is called
-   * when the route is entered. The route parameters are passed as object.
+   * @param path - A path or a pattern (e.g.: `/user/:id`).
+   * @param action - A function that is called when the route is entered. The
+   * route parameters are passed as an object.
    */
-  route(path, action) {
+  route(path: string, action: RouteAction) {
     this.routes.push(new Route(path, action))
   }
 
   /**
    * Push a new route.
-   * @param {string} path
    */
-  push(path) {
+  push(path: string) {
     window.history.pushState(null, null, stripTrailingSlash(path))
     this._handleChange(path)
   }
 
   /**
    * Replace current route with a new route.
-   * @param {string} path
    */
-  replace(path) {
+  replace(path: string) {
     window.history.replaceState(null, null, stripTrailingSlash(path))
     this._handleChange(path)
   }
@@ -56,28 +65,19 @@ export class Router {
     this._handleChange(window.location.pathname, true)
   }
 
-  /**
-   * @param {(route: RouteObject) => any?} callback
-   */
-  beforeEach(callback) {
+  beforeEach(callback: (route: RouteObject) => any) {
     this._handleBeforeEach = callback
   }
 
-  /**
-   * @param {(route: RouteObject) => any?} callback
-   */
-  afterEach(callback) {
+  afterEach(callback: (route: RouteObject) => any) {
     this._handleAfterEach = callback
   }
 
   /**
    * Search for the first route that matches the path and call the routes
    * callback.
-   * @private
-   * @param {string} path
-   * @param {boolean} initial
    */
-  _handleChange(path, initial = false) {
+  private _handleChange(path: string, initial = false) {
     for (const route of this.routes) {
       const params = route.match(path)
       if (params) {

@@ -1,36 +1,22 @@
-import { babel } from '@rollup/plugin-babel'
-import { terser } from 'rollup-plugin-terser'
+import fileSize from 'rollup-plugin-filesize'
+import esbuild from 'rollup-plugin-esbuild'
+import dts from 'rollup-plugin-dts'
 
-export default [
-  {
-    input: 'src/index.js',
-    output: {
-      file: 'dist/index.iife.js',
-      format: 'iife',
-      name: 'Router',
-      sourcemap: true
-    },
-    plugins: [babel({ babelHelpers: 'bundled' }), terser()]
-  },
-  {
-    input: 'src/index.js',
-    output: {
-      file: 'dist/index.js',
-      format: 'cjs',
-      name: 'Router',
-      exports: 'default',
-      sourcemap: true
-    },
-    plugins: [babel({ babelHelpers: 'bundled' }), terser()]
-  },
-  {
-    input: 'src/index.js',
-    output: {
-      file: 'dist/index.esm.js',
-      format: 'es',
-      name: 'Router',
-      sourcemap: true
-    },
-    plugins: [terser()]
-  }
-]
+const isProduction = process.env.BUILD === 'production'
+
+const types = {
+  input: './src/index.ts',
+  output: [{ file: 'dist/types.d.ts', format: 'es' }],
+  plugins: [dts()],
+}
+
+const bundle = {
+  input: 'src/index.ts',
+  output: { file: 'dist/index.es.js', format: 'es', sourcemap: isProduction },
+  plugins: [
+    esbuild({ minify: isProduction }),
+    fileSize({ showMinifiedSize: false, showBrotliSize: true }),
+  ],
+}
+
+export default isProduction ? [bundle, types] : bundle

@@ -11,22 +11,9 @@ lightweight SPAs or enhance your traditional multi page websites.
 
 ### Manual
 
-You can also include `very-simple-router` directly in the browser. Download this
-repository and place it in the root folder of your website. Then you can either
-use a iife:
-
-```html
-<script src="./very-simple-router/dist/index.iife.js"></script>
-<script>
-  const router = new Router()
-</script>
-```
-
-or a javascript module:
-
 ```html
 <script type="module">
-  import Router from './very-simple-router/dist/index.esm.js'
+  import Router from './very-simple-router/dist/index.es.js'
 </script>
 ```
 
@@ -59,8 +46,8 @@ To prevent the links from actually changing the page we have to intercept the
 click events and push/replace a route instead.
 
 ```js
-document.querySelectorAll('a.router-link').forEach(el =>
-  el.addEventListener('click', event => {
+document.querySelectorAll('a.router-link').forEach((el) =>
+  el.addEventListener('click', (event) => {
     event.preventDefault()
     router.push(el.getAttribute('href'))
   })
@@ -78,9 +65,9 @@ You can define the routes directly when creating the router (or use the
 const router = new Router({
   routes: [
     { path: '/', action: () => console.log('Home') },
-    { path: '/user/:name', action: ({ name }) => console.log(`Hello ${id}!`) }
+    { path: '/user/:name', action: ({ name }) => console.log(`Hello ${id}!`) },
   ],
-  scrollRestoration: 'auto' // default is 'manual'
+  scrollRestoration: 'auto', // default is 'manual'
 })
 ```
 
@@ -110,7 +97,7 @@ You can use one or more dynamic segments (denoted by a colon `:`). The dynamic
 segments will then be available in the route's action callback.
 
 ```js
-const action = params => {
+const action = (params) => {
   console.log(`Hello ${params.firstName} ${params.lastName}!`)
 }
 router.route('/user/:firstName/:lastName', action)
@@ -181,8 +168,8 @@ router.route('*', () => console.log('Not found!'))
 Execute a callback before or after each route. This are simple hooks, no navigation guards. So you can't use them to redirect or cancel routes. The callbacks receive a route object as an argument containing the `path`, `pattern` and `params`.
 
 ```js
-router.beforeEach(route => console.log(`Changing to path: ${route.path}`))
-router.afterEach(route => console.log(`Changed to path: ${route.path}`))
+router.beforeEach((route) => console.log(`Changing to path: ${route.path}`))
+router.afterEach((route) => console.log(`Changed to path: ${route.path}`))
 ```
 
 ## Important
