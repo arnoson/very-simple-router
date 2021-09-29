@@ -16,7 +16,7 @@
     <h1>Click one of the links above</h1>
 
     <script type="module">
-      import Router from '../src/index.js'
+      import Router from '../dist/index.es.js'
       const router = new Router()
 
       router.route('/', () => setContent('Home'))
@@ -24,12 +24,13 @@
       router.route('/hello/:name', ({ name }) => setContent(`Hello ${name}!`))
       router.route('*', () => setContent('404 - Not found'))
 
-      const setContent = text => (document.querySelector('h1').innerHTML = text)
+      const setContent = (text) =>
+        (document.querySelector('h1').innerHTML = text)
 
       // Prevent links from actually changing the page and push a new route
       // instead.
-      document.querySelectorAll('a').forEach(el =>
-        el.addEventListener('click', event => {
+      document.querySelectorAll('a').forEach((el) =>
+        el.addEventListener('click', (event) => {
           event.preventDefault()
           router.push(el.getAttribute('href'))
         })
