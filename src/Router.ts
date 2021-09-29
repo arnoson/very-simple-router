@@ -89,7 +89,6 @@ export class Router {
   }
 
   init() {
-    console.log('init!')
     this._handleChange(window.location.pathname, true)
   }
 
