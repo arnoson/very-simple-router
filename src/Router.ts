@@ -5,7 +5,8 @@ export interface RouteObject {
   path: string
   pattern: string
   params: RouteParams
-  matched: boolean
+  matches: boolean
+  initial: boolean
 }
 
 export interface RouteDefinition {
@@ -18,22 +19,17 @@ export interface RouterOptions {
   scrollRestoration?: ScrollRestoration
 }
 
-export type BeforeEachHandler = (
+export type RouteEventHandler = (
   to: RouteObject,
-  from: RouteObject
-) => any | Promise<any>
-
-export type AfterEachHandler = (
-  to: RouteObject,
-  from: RouteObject
+  from: RouteObject,
+  initial?: boolean
 ) => any | Promise<any>
 
 export class Router {
   routes: Route[] = []
   currentRoute: RouteObject
 
-  private _beforeEachHandlers = [] as BeforeEachHandler[]
-  private _afterEachHandlers = [] as AfterEachHandler[]
+  private _handlers = {} as Record<string, RouteEventHandler[]>
 
   constructor({
     routes = [],
@@ -44,6 +40,26 @@ export class Router {
     window.addEventListener('popstate', () =>
       this._handleChange(window.location.pathname)
     )
+  }
+
+  on(event: string, handler: RouteEventHandler) {
+    this._handlers[event] ??= []
+    this._handlers[event].push(handler)
+  }
+
+  off(event: string, handler: RouteEventHandler) {
+    this._handlers[event]?.splice(this._handlers[event].indexOf(handler), 1)
+  }
+
+  async emit(
+    event: string,
+    to: RouteObject,
+    from: RouteObject,
+    initial?: boolean
+  ) {
+    for (const handler of this._handlers[event] ?? []) {
+      await handler(to, from, initial)
+    }
   }
 
   /**
@@ -73,20 +89,8 @@ export class Router {
   }
 
   init() {
+    console.log('init!')
     this._handleChange(window.location.pathname, true)
-  }
-
-  beforeEach(handler: BeforeEachHandler) {
-    this._beforeEachHandlers.push(handler)
-  }
-
-  afterEach(handler: AfterEachHandler) {
-    this._afterEachHandlers.push(handler)
-  }
-
-  use(middleware: { init?: () => any; beforeEach: BeforeEachHandler }) {
-    middleware.init?.()
-    this.beforeEach(middleware.beforeEach)
   }
 
   private _findRoute(path: string) {
@@ -108,17 +112,13 @@ export class Router {
       path,
       params,
       pattern: route?.pattern,
-      matched: !!route,
+      matches: !!route,
+      initial,
     }
 
-    for (const handler of this._beforeEachHandlers) {
-      await handler(this.currentRoute, previousRoute)
-    }
-
+    await this.emit('before-leave', this.currentRoute, previousRoute, initial)
+    await this.emit('before-route', this.currentRoute, previousRoute, initial)
     await route?.action(params, initial)
-
-    for (const handler of this._afterEachHandlers) {
-      await handler(this.currentRoute, previousRoute)
-    }
+    await this.emit('route', this.currentRoute, previousRoute, initial)
   }
 }
