@@ -2,8 +2,7 @@
   "name": "very-simple-router",
   "version": "1.1.0",
   "description": "A very simple vanilla js router",
-  "main": "./dist/index.js",
-  "module": "./src/index.js",
+  "module": "./dist/index.es.js",
   "types": "./dist/types.d.ts",
   "repository": {
     "type": "git",
