@@ -25,11 +25,11 @@ export class Route {
     keys: Array<string>
     regExp: RegExp
   } {
-    const keys = pattern.match(/(:[^/]+)/g)?.map(name => name.substr(1))
+    const keys = pattern.match(/(:[^/]+)/g)?.map((name) => name.substr(1))
     return (
       keys && {
         keys,
-        regExp: new RegExp('^' + pattern.replace(/(:[^/]+)/g, '([^/]+)') + '$')
+        regExp: new RegExp('^' + pattern.replace(/(:[^/]+)/g, '([^/]+)') + '$'),
       }
     )
   }
