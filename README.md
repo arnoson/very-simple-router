@@ -1,6 +1,6 @@
 # Very Simple Router
 
-A simple vanilla js router written in modern javascript. You can use it to build
+A simple vanilla js router written in typescript. You can use it to build
 lightweight SPAs or enhance your traditional multi page websites.
 
 ## Installation
