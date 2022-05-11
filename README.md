@@ -7,22 +7,14 @@ lightweight SPAs or enhance your traditional multi page websites.
 
 ### Npm
 
-`npm install very-simple-router`
-
-### Manual
-
-```html
-<script type="module">
-  import Router from './very-simple-router/dist/index.es.js'
-</script>
-```
+`npm install @very-simple/router`
 
 ## Usage
 
 ### Create a new Router and add Routes:
 
 ```js
-import Router from 'very-simple-router'
+import Router from '@very-simple/router'
 
 const router = new Router()
 router.route('/', () => console.log('Home'))
@@ -165,11 +157,16 @@ router.route('*', () => console.log('Not found!'))
 
 ### Hooks
 
-Execute a callback before or after each route. This are simple hooks, no navigation guards. So you can't use them to redirect or cancel routes. The callbacks receive a route object as an argument containing the `path`, `pattern` and `params`.
+Execute a callback before or after each route. This are simple hooks, no navigation guards. So you can't use them to redirect or cancel routes. The callbacks receive the new and the previous route.
 
 ```js
-router.beforeEach((route) => console.log(`Changing to path: ${route.path}`))
-router.afterEach((route) => console.log(`Changed to path: ${route.path}`))
+// Gets called before the to route's action is called.
+router.on('before-route', (to, from) =>
+  console.log(`Changing to path: ${route.path}`)
+)
+
+// Gets called after the to route's action is called.
+router.on('route', (to, from) => console.log(`Changed to path: ${route.path}`))
 ```
 
 ## Important
