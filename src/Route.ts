@@ -4,28 +4,30 @@ export type RouteParams = Record<string, string>
 
 export type RouteAction = (params: RouteParams, initial?: boolean) => any
 
+interface ParsedPattern {
+  keys: Array<string>
+  regExp: RegExp
+}
+
 export class Route {
   pattern: string
   catchAll: boolean
-  regExp: RegExp
+  regExp: RegExp | undefined
   // TODO: what type?
-  keys: any
+  keys: string[]
 
   constructor(public path: string, public action: RouteAction) {
     path = stripTrailingSlash(path)
     this.pattern = path
     this.catchAll = path === '*'
 
-    const { regExp, keys } = this._parsePattern(path) || {}
+    const { regExp, keys } = this.parsePattern(path) || {}
     this.regExp = regExp
-    this.keys = keys
+    this.keys = keys ?? []
   }
 
-  private _parsePattern(pattern: string): {
-    keys: Array<string>
-    regExp: RegExp
-  } {
-    const keys = pattern.match(/(:[^/]+)/g)?.map((name) => name.substr(1))
+  private parsePattern(pattern: string): ParsedPattern | undefined {
+    const keys = pattern.match(/(:[^/]+)/g)?.map((name) => name.substring(1))
     return (
       keys && {
         keys,
@@ -34,16 +36,16 @@ export class Route {
     )
   }
 
-  match(path: string): RouteParams {
+  match(path: string): RouteParams | false {
     return (
       path !== undefined &&
       (this.regExp
-        ? this._getParams(path.match(this.regExp))
+        ? this.getParams(path.match(this.regExp)) ?? false
         : (this.catchAll || path === this.path) && {})
     )
   }
 
-  _getParams(match: string[]) {
+  private getParams(match: string[] | null) {
     if (match) {
       const params: RouteParams = {}
       this.keys.forEach(

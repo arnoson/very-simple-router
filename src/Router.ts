@@ -3,7 +3,7 @@ import { Route, RouteAction, RouteParams } from './Route'
 
 export interface RouteObject {
   path: string
-  pattern: string
+  pattern?: string
   params: RouteParams
   matches: boolean
   initial: boolean
@@ -19,15 +19,17 @@ export interface RouterOptions {
   scrollRestoration?: ScrollRestoration
 }
 
+export type RouteEvent = 'before-route' | 'route'
+
 export type RouteEventHandler = (
   to: RouteObject,
-  from: RouteObject,
+  from?: RouteObject,
   initial?: boolean
 ) => any | Promise<any>
 
 export class Router {
   routes: Route[] = []
-  currentRoute: RouteObject
+  currentRoute: RouteObject | undefined
 
   private _handlers = {} as Record<string, RouteEventHandler[]>
 
@@ -38,27 +40,22 @@ export class Router {
     routes.forEach(({ path, action }) => this.route(path, action))
     window.history.scrollRestoration = scrollRestoration
     window.addEventListener('popstate', () =>
-      this._handleChange(window.location.pathname)
+      this.handleChange(window.location.pathname)
     )
   }
 
-  on(event: string, handler: RouteEventHandler) {
+  on(event: RouteEvent, handler: RouteEventHandler) {
     this._handlers[event] ??= []
     this._handlers[event].push(handler)
   }
 
-  off(event: string, handler: RouteEventHandler) {
+  off(event: RouteEvent, handler: RouteEventHandler) {
     this._handlers[event]?.splice(this._handlers[event].indexOf(handler), 1)
   }
 
-  async emit(
-    event: string,
-    to: RouteObject,
-    from: RouteObject,
-    initial?: boolean
-  ) {
+  async emit(event: RouteEvent, to: RouteObject, from?: RouteObject) {
     for (const handler of this._handlers[event] ?? []) {
-      await handler(to, from, initial)
+      await handler(to, from)
     }
   }
 
@@ -76,23 +73,23 @@ export class Router {
    * Push a new route.
    */
   push(path: string) {
-    window.history.pushState(null, null, stripTrailingSlash(path))
-    this._handleChange(path)
+    window.history.pushState(null, '', stripTrailingSlash(path))
+    this.handleChange(path)
   }
 
   /**
    * Replace current route with a new route.
    */
   replace(path: string) {
-    window.history.replaceState(null, null, stripTrailingSlash(path))
-    this._handleChange(path)
+    window.history.replaceState(null, '', stripTrailingSlash(path))
+    this.handleChange(path)
   }
 
   init() {
-    this._handleChange(window.location.pathname, true)
+    this.handleChange(window.location.pathname || '/', true)
   }
 
-  private _findRoute(path: string) {
+  private findRoute(path: string) {
     for (const route of this.routes) {
       const params = route.match(path)
       if (params) return { route, params }
@@ -103,8 +100,8 @@ export class Router {
    * Search for the first route that matches the path and call the routes
    * callback.
    */
-  private async _handleChange(path: string, initial = false) {
-    const { route, params } = this._findRoute(path) ?? {}
+  private async handleChange(path: string, initial = false) {
+    const { route, params = {} } = this.findRoute(path) ?? {}
 
     const previousRoute = this.currentRoute
     this.currentRoute = {
@@ -115,9 +112,8 @@ export class Router {
       initial,
     }
 
-    await this.emit('before-leave', this.currentRoute, previousRoute, initial)
-    await this.emit('before-route', this.currentRoute, previousRoute, initial)
+    await this.emit('before-route', this.currentRoute, previousRoute)
     await route?.action(params, initial)
-    await this.emit('route', this.currentRoute, previousRoute, initial)
+    await this.emit('route', this.currentRoute, previousRoute)
   }
 }

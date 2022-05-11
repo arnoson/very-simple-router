@@ -1,19 +1,20 @@
 {
-  "name": "very-simple-router",
+  "name": "@very-simple/router",
   "version": "1.1.0",
   "description": "A very simple vanilla js router",
-  "module": "./dist/index.es.js",
+  "module": "./dist/index.js",
+  "type": "module",
   "types": "./dist/types.d.ts",
   "repository": {
     "type": "git",
     "url": "https://github.com/very-simple/router.git"
   },
   "scripts": {
-    "build": "rm -rf ./dist && rollup --config --environment BUILD:production",
-    "dev": "rollup --config --watch",
+    "build": "shx rm -rf ./dist && tsup src/index.ts --dts --format esm",
+    "dev": "vite",
     "prepublishOnly": "npm run build",
     "publish-package": "np --no-2fa",
-    "test": "jest"
+    "test": "vitest"
   },
   "author": "arnoson",
   "license": "MIT",
@@ -29,11 +30,10 @@
     "SPA"
   ],
   "devDependencies": {
-    "@types/jest": "^26.0.20",
-    "esbuild-jest": "^0.5.0",
-    "jest": "^26.6.3",
-    "rollup": "^2.38.5",
-    "rollup-plugin-dts": "^3.0.2",
-    "rollup-plugin-esbuild": "^4.5.0"
+    "happy-dom": "^3.2.0",
+    "shx": "^0.3.4",
+    "tsup": "^5.12.7",
+    "vite": "^2.9.9",
+    "vitest": "^0.12.4"
   }
 }
