@@ -1,10 +1,13 @@
 {
   "name": "@very-simple/router",
-  "version": "1.1.0",
+  "version": "0.0.0",
   "description": "A very simple vanilla js router",
   "module": "./dist/index.js",
   "type": "module",
   "types": "./dist/types.d.ts",
+  "files": [
+    "dist/**"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/very-simple/router.git"
@@ -13,7 +16,7 @@
     "build": "shx rm -rf ./dist && tsup src/index.ts --dts --format esm",
     "dev": "vite",
     "prepublishOnly": "npm run build",
-    "publish-package": "np --no-2fa",
+    "release": "np --no-2fa",
     "test": "vitest"
   },
   "author": "arnoson",
@@ -31,6 +34,7 @@
   ],
   "devDependencies": {
     "happy-dom": "^3.2.0",
+    "np": "^7.6.1",
     "shx": "^0.3.4",
     "tsup": "^5.12.7",
     "vite": "^2.9.9",
