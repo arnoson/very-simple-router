@@ -4,7 +4,7 @@
   "description": "A very simple vanilla js router",
   "module": "./dist/index.js",
   "type": "module",
-  "types": "./dist/types.d.ts",
+  "types": "./dist/index.d.ts",
   "files": [
     "dist/**"
   ],
