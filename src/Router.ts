@@ -1,12 +1,14 @@
 import { stripTrailingSlash } from './utils'
 import { Route, RouteAction, RouteParams } from './Route'
 
+export type RouteTrigger = 'init' | 'push' | 'replace' | 'popstate'
+
 export interface RouteObject {
   path: string
   pattern?: string
   params: RouteParams
   matches: boolean
-  initial: boolean
+  trigger: RouteTrigger
 }
 
 export interface RouteDefinition {
@@ -40,7 +42,7 @@ export class Router {
     routes.forEach(({ path, action }) => this.route(path, action))
     window.history.scrollRestoration = scrollRestoration
     window.addEventListener('popstate', () =>
-      this.handleChange(window.location.pathname)
+      this.handleChange(window.location.pathname, 'popstate')
     )
   }
 
@@ -74,7 +76,7 @@ export class Router {
    */
   push(path: string) {
     window.history.pushState(null, '', stripTrailingSlash(path))
-    this.handleChange(path)
+    this.handleChange(path, 'push')
   }
 
   /**
@@ -82,11 +84,11 @@ export class Router {
    */
   replace(path: string) {
     window.history.replaceState(null, '', stripTrailingSlash(path))
-    this.handleChange(path)
+    this.handleChange(path, 'replace')
   }
 
   init() {
-    this.handleChange(window.location.pathname || '/', true)
+    this.handleChange(window.location.pathname || '/', 'init')
   }
 
   private findRoute(path: string) {
@@ -100,7 +102,7 @@ export class Router {
    * Search for the first route that matches the path and call the routes
    * callback.
    */
-  private async handleChange(path: string, initial = false) {
+  private async handleChange(path: string, trigger: RouteTrigger) {
     const { route, params = {} } = this.findRoute(path) ?? {}
 
     const previousRoute = this.currentRoute
@@ -109,11 +111,11 @@ export class Router {
       params,
       pattern: route?.pattern,
       matches: !!route,
-      initial,
+      trigger,
     }
 
     await this.emit('before-route', this.currentRoute, previousRoute)
-    await route?.action(params, initial)
+    await route?.action(params)
     await this.emit('route', this.currentRoute, previousRoute)
   }
 }
