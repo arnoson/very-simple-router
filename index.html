@@ -16,13 +16,13 @@
     <h1>Click one of the links above</h1>
 
     <script type="module">
-      import Router from './src/index.ts'
-      const router = new Router()
+      import router from './src/index.ts'
 
       router.route('/', () => setContent('Home'))
       router.route('/some-path', () => setContent('Some path'))
       router.route('/hello/:name', ({ name }) => setContent(`Hello ${name}!`))
       router.route('*', () => setContent('404 - Not found'))
+      router.start()
 
       const setContent = (text) =>
         (document.querySelector('h1').innerHTML = text)

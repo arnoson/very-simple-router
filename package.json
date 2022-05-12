@@ -17,7 +17,8 @@
     "dev": "vite",
     "prepublishOnly": "npm run build",
     "release": "np --no-2fa",
-    "test": "vitest run"
+    "test": "vitest run",
+    "test-dev": "vitest watch"
   },
   "author": "arnoson",
   "license": "MIT",

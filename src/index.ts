@@ -1,3 +1,3 @@
-export * from './Router'
-export * from './Route'
-export { Router as default } from './Router'
+import { Router } from './Router'
+export * from './types'
+export default new Router()

@@ -1,7 +1,9 @@
 {
   "compilerOptions": {
     "lib": ["es6", "dom"],
-    "strict": true
+    "strict": true,
+    "target": "esnext",
+    "moduleResolution": "node"
   },
   "typeAcquisition": {
     "include": ["jest"]

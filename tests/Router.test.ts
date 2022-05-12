@@ -1,7 +1,8 @@
 import { describe, it, expect, vi } from 'vitest'
+import { RouteObject } from '../src'
+import { Route } from '../src/Route'
 
 import { Router } from '../src/Router'
-import { Route } from '../src/Route'
 
 const flushPromises = () => new Promise(setImmediate)
 
@@ -14,30 +15,20 @@ const navigateToPath = (path: string) => {
 }
 
 describe('Router', () => {
-  it('creates a new instance', () => {
-    const path = '/path'
-    const action = () => {}
-    const router = new Router({
-      routes: [{ path, action }],
-      scrollRestoration: 'manual',
-    })
-
-    expect(window.history.scrollRestoration).toBe('manual')
-    const createdRoute = router.routes[0]
-    expect(createdRoute).toBeInstanceOf(Route)
-    expect(createdRoute).toMatchObject({ path, action })
-  })
-
   it('handles the initial route', async () => {
     const router = new Router()
 
     const action = vi.fn()
     router.route('/', action)
 
-    router.init()
+    router.start()
     await flushPromises()
 
-    expect(action).toBeCalledWith({}, true)
+    expect(action).toBeCalledWith(
+      {},
+      expect.objectContaining({ trigger: 'init' }),
+      undefined
+    )
   })
 
   it('pushes a new route', () => {
@@ -69,11 +60,21 @@ describe('Router', () => {
     const router = new Router()
     const action = vi.fn()
     router.route('/path/:param', action)
+    router.start(false)
 
     navigateToPath('/path/test')
     await flushPromises()
 
-    expect(action).toBeCalledWith({ param: 'test' }, false)
+    const params = { param: 'test' }
+    const route: RouteObject = {
+      path: '/path/test',
+      params,
+      pattern: '/path/:param',
+      matches: true,
+      trigger: 'popstate',
+    }
+
+    expect(action).toBeCalledWith(params, route, undefined)
   })
 
   it('catches unresolved routes', async () => {
@@ -82,6 +83,7 @@ describe('Router', () => {
 
     router.route('/path', () => {})
     router.route('*', action)
+    router.start()
 
     navigateToPath('/does-not-exist')
     await flushPromises()
@@ -92,6 +94,7 @@ describe('Router', () => {
   it('calls hook before route', async () => {
     const router = new Router()
     router.route('/', () => {})
+    router.start(false)
 
     const callback = vi.fn()
     router.on('before-route', callback)
@@ -99,12 +102,12 @@ describe('Router', () => {
     navigateToPath('/')
     await flushPromises()
 
-    const to = {
+    const to: RouteObject = {
       path: '/',
       params: {},
       pattern: '/',
       matches: true,
-      initial: false,
+      trigger: 'popstate',
     }
     const from = undefined
     expect(callback).toBeCalledWith(to, from)

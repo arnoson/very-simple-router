@@ -1,62 +1,37 @@
+import { Route } from './Route'
+import {
+  RouteAction,
+  RouteEvent,
+  RouteEventHandler,
+  RouteObject,
+  RouteTrigger,
+} from './types'
 import { stripTrailingSlash } from './utils'
-import { Route, RouteAction, RouteParams } from './Route'
-
-export type RouteTrigger = 'init' | 'push' | 'replace' | 'popstate'
-
-export interface RouteObject {
-  path: string
-  pattern?: string
-  params: RouteParams
-  matches: boolean
-  trigger: RouteTrigger
-}
-
-export interface RouteDefinition {
-  path: string
-  action: RouteAction
-}
-
-export interface RouterOptions {
-  routes?: RouteDefinition[]
-  scrollRestoration?: ScrollRestoration
-}
-
-export type RouteEvent = 'before-route' | 'route'
-
-export type RouteEventHandler = (
-  to: RouteObject,
-  from?: RouteObject,
-  initial?: boolean
-) => any | Promise<any>
 
 export class Router {
   routes: Route[] = []
   currentRoute: RouteObject | undefined
 
-  private _handlers = {} as Record<string, RouteEventHandler[]>
+  private handlers = {} as Record<string, RouteEventHandler[]>
 
-  constructor({
-    routes = [],
-    scrollRestoration = 'manual',
-  }: RouterOptions = {}) {
-    routes.forEach(({ path, action }) => this.route(path, action))
-    window.history.scrollRestoration = scrollRestoration
+  start(handleInitial = true) {
+    handleInitial && this.handleChange(window.location.pathname || '/', 'init')
     window.addEventListener('popstate', () =>
       this.handleChange(window.location.pathname, 'popstate')
     )
   }
 
   on(event: RouteEvent, handler: RouteEventHandler) {
-    this._handlers[event] ??= []
-    this._handlers[event].push(handler)
+    this.handlers[event] ??= []
+    this.handlers[event].push(handler)
   }
 
   off(event: RouteEvent, handler: RouteEventHandler) {
-    this._handlers[event]?.splice(this._handlers[event].indexOf(handler), 1)
+    this.handlers[event]?.splice(this.handlers[event].indexOf(handler), 1)
   }
 
   async emit(event: RouteEvent, to: RouteObject, from?: RouteObject) {
-    for (const handler of this._handlers[event] ?? []) {
+    for (const handler of this.handlers[event] ?? []) {
       await handler(to, from)
     }
   }
@@ -71,24 +46,14 @@ export class Router {
     this.routes.push(new Route(path, action))
   }
 
-  /**
-   * Push a new route.
-   */
   push(path: string) {
     window.history.pushState(null, '', stripTrailingSlash(path))
     this.handleChange(path, 'push')
   }
 
-  /**
-   * Replace current route with a new route.
-   */
   replace(path: string) {
     window.history.replaceState(null, '', stripTrailingSlash(path))
     this.handleChange(path, 'replace')
-  }
-
-  init() {
-    this.handleChange(window.location.pathname || '/', 'init')
   }
 
   private findRoute(path: string) {
@@ -115,7 +80,7 @@ export class Router {
     }
 
     await this.emit('before-route', this.currentRoute, previousRoute)
-    await route?.action(params)
+    await route?.action(params, this.currentRoute, previousRoute)
     await this.emit('route', this.currentRoute, previousRoute)
   }
 }

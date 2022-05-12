@@ -1,6 +1,6 @@
 # Very Simple Router
 
-A simple vanilla js router written in typescript. You can use it to build
+A simple dependency-free router written in typescript. You can use it to build
 lightweight SPAs or enhance your traditional multi page websites.
 
 ## Installation
@@ -11,19 +11,19 @@ lightweight SPAs or enhance your traditional multi page websites.
 
 ## Usage
 
-### Create a new Router and add Routes:
+### Add routes and start the router
 
 ```js
-import Router from '@very-simple/router'
+import router from '@very-simple/router'
 
-const router = new Router()
 router.route('/', () => console.log('Home'))
 router.route('/about', () => console.log('About'))
 router.route('/projects/:id', ({ id }) => console.log(`Show project ${id}`))
 router.route('*', () => console.log('Not found!'))
 
-// In most cases, you probably want the router to handle the initial route.
-router.init()
+// Start listening to history navigation events and handle the initial route.
+// If you don't want to handle the initial route use `router.start(false)`.
+router.start()
 ```
 
 ### Handle Link Navigation:
@@ -48,19 +48,10 @@ document.querySelectorAll('a.router-link').forEach((el) =>
 
 ## Documentation
 
-### Configuration
-
-You can define the routes directly when creating the router (or use the
-[`route()`](#add-a-new-route) method) and set the history scrollRestoration.
+### Start
 
 ```js
-const router = new Router({
-  routes: [
-    { path: '/', action: () => console.log('Home') },
-    { path: '/user/:name', action: ({ name }) => console.log(`Hello ${id}!`) },
-  ],
-  scrollRestoration: 'auto', // default is 'manual'
-})
+router.start() // Use `start(false)` to ignore the initial route.
 ```
 
 ### Push a new Route
@@ -78,8 +69,55 @@ router.replace('/path/to/something')
 ### Add a new Route
 
 ```js
-router.route('/path', () => {
+router.route('/path', (params, to, from) => {
   // Do something ...
+})
+```
+
+`to` and `from` are `RouteObjects`:
+
+```ts
+interface RouteObject {
+  // The actual path (`hello/world`)
+  path: string
+
+  // The pattern used in `router.route()` (`hello/:name`)
+  pattern?: string
+
+  // All dynamic path segments ({ name: 'world' })
+  params: Record<string, string>
+
+  // Wether or not a route matched. This is obviously the case if you receive
+  // this in a route's callback, but can be useful if you are using
+  // `router.currentRoute`.
+  matches: boolean
+
+  // What caused the route.
+  trigger: 'init' | 'push' | 'replace' | 'popstate'
+}
+```
+
+You can handle the initial route differently (e.g.: no smooth scrolling):
+
+```js
+router.route('projects/:id', (params, route) => {
+  const isInitial = route.trigger === 'init'
+  const el = document.getElementById(params.id)
+  el.scrollIntoView({ behavior: isInitial ? 'auto' : 'smooth' })
+})
+```
+
+Or differentiate between manual push/replace navigation and the browser's
+back/forward buttons:
+
+```js
+router.route('data/:url', (params, route) => {
+  const shouldUseCache = route.trigger === 'popstate'
+  if (shouldUseCache) {
+    // use cached data
+  } else {
+    // fetch new data
+  }
 })
 ```
 
@@ -95,46 +133,11 @@ const action = (params) => {
 router.route('/user/:firstName/:lastName', action)
 ```
 
-### Handle initial route
-
-In most cases you probably want the router to handle the initial route:
-
-```js
-const router = new Router()
-router.route('*', () => console.log('hello world!'))
-// This will call the route immediately:
-router.init()
-```
-
-In some cases you may want to handle the initial route differently (e.g.: no
-smooth scrolling):
-
-```js
-const router = new Router()
-router.route('projects/:id', (params, initial) => {
-  const el = document.getElementById(params.id)
-  el.scrollIntoView({ behavior: initial ? 'auto' : 'smooth' })
-})
-router.init()
-```
-
 ### Use the current Route
 
-You can also use the current route anywhere in your project:
+Use the current route anywhere in your project:
 
 ```js
-// router.js
-import Router from 'very-simple-router'
-export default const router = new Router({
-  routes: [
-    { path: '/', () => { /* ... */ } },
-    { path: '/user/:name', () => { /* ... */ } }
-  ]
-})
-```
-
-```js
-// another-file.js
 import router from './router.js'
 
 window.addEventListener('click', () => {
@@ -161,17 +164,17 @@ Execute a callback before or after each route. This are simple hooks, no navigat
 
 ```js
 // Gets called before the to route's action is called.
-router.on('before-route', (to, from) =>
-  console.log(`Changing to path: ${route.path}`)
-)
+router.on('before-route', (to, from) => console.log(`Changing to: ${to.path}`))
 
 // Gets called after the to route's action is called.
-router.on('route', (to, from) => console.log(`Changed to path: ${route.path}`))
+router.on('route', (to, from) =>
+  console.log(`Changed to: ${to.path} from: ${from.path}`)
+)
 ```
 
 ## Important
 
-- `very-simple-router` uses HTML5 history mode only, so make sure your server is
+- the router uses HTML5 history mode only, so make sure your server is
   setup correctly (see vue router's [explanation](https://router.vuejs.org/guide/essentials/history-mode.html#example-server-configurations)).
 - The asterisk `*` can only be used to catch all routes. It is not possible to
   use it like this `'/user-*'`.

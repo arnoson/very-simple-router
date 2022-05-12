@@ -1,13 +1,5 @@
-import { stripTrailingSlash } from './utils'
-
-export type RouteParams = Record<string, string>
-
-export type RouteAction = (params: RouteParams, initial?: boolean) => any
-
-interface ParsedPattern {
-  keys: Array<string>
-  regExp: RegExp
-}
+import { RouteAction, RouteParams } from './types'
+import { parsePattern, stripTrailingSlash } from './utils'
 
 export class Route {
   pattern: string
@@ -20,19 +12,9 @@ export class Route {
     this.pattern = path
     this.catchAll = path === '*'
 
-    const { regExp, keys } = this.parsePattern(path) || {}
+    const { regExp, keys } = parsePattern(path) || {}
     this.regExp = regExp
     this.keys = keys
-  }
-
-  private parsePattern(pattern: string): ParsedPattern | undefined {
-    const keys = pattern.match(/(:[^/]+)/g)?.map((name) => name.substring(1))
-    return (
-      keys && {
-        keys,
-        regExp: new RegExp('^' + pattern.replace(/(:[^/]+)/g, '([^/]+)') + '$'),
-      }
-    )
   }
 
   match(path: string): RouteParams | false {
