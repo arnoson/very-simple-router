@@ -1,7 +1,7 @@
 {
   "name": "@very-simple/router",
   "version": "0.0.4",
-  "description": "A very simple vanilla js router",
+  "description": "A very simple router",
   "module": "./dist/index.js",
   "type": "module",
   "types": "./dist/index.d.ts",
