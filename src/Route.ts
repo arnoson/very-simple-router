@@ -13,8 +13,7 @@ export class Route {
   pattern: string
   catchAll: boolean
   regExp: RegExp | undefined
-  // TODO: what type?
-  keys: string[]
+  keys: string[] | undefined
 
   constructor(public path: string, public action: RouteAction) {
     path = stripTrailingSlash(path)
@@ -23,7 +22,7 @@ export class Route {
 
     const { regExp, keys } = this.parsePattern(path) || {}
     this.regExp = regExp
-    this.keys = keys ?? []
+    this.keys = keys
   }
 
   private parsePattern(pattern: string): ParsedPattern | undefined {
@@ -48,7 +47,7 @@ export class Route {
   private getParams(match: string[] | null) {
     if (match) {
       const params: RouteParams = {}
-      this.keys.forEach(
+      this.keys?.forEach(
         // The first element in `match` contains the whole string so we have to
         // offset the index by 1.
         (key: string, index: number) => (params[key] = match[index + 1])
