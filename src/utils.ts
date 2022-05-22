@@ -18,3 +18,8 @@ export const parsePattern = (pattern: string): ParsedPattern | undefined => {
     }
   )
 }
+
+export const getParams = (match: string[], keys: string[]) =>
+  // The first element in `match` contains the whole string so we have to
+  // offset the index by 1.
+  Object.fromEntries(keys.map((key, index) => [key, match[index + 1]]))

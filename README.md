@@ -21,8 +21,6 @@ router.route('/about', () => console.log('About'))
 router.route('/projects/:id', ({ id }) => console.log(`Show project ${id}`))
 router.route('*', () => console.log('Not found!'))
 
-// Start listening to history navigation events and handle the initial route.
-// If you don't want to handle the initial route use `router.start(false)`.
 router.start()
 ```
 
@@ -51,7 +49,14 @@ document.querySelectorAll('a.router-link').forEach((el) =>
 ### Start
 
 ```js
-router.start() // Use `start(false)` to ignore the initial route.
+router.start(options?)
+```
+
+```js
+interface RouterOptions {
+  // Wether or not to handle the initial route, default is `true`
+  handleInitial: boolean;
+}
 ```
 
 ### Push a new Route
@@ -69,32 +74,7 @@ router.replace('/path/to/something')
 ### Add a new Route
 
 ```js
-router.route('/path', (params, to, from) => {
-  // Do something ...
-})
-```
-
-`to` and `from` are `RouteObjects`:
-
-```ts
-interface RouteObject {
-  // The actual path (`hello/world`)
-  path: string
-
-  // The pattern used in `router.route()` (`hello/:name`)
-  pattern?: string
-
-  // All dynamic path segments ({ name: 'world' })
-  params: Record<string, string>
-
-  // Wether or not a route matched. This is obviously the case if you receive
-  // this in a route's callback, but can be useful if you are using
-  // `router.currentRoute`.
-  matches: boolean
-
-  // What caused the route.
-  trigger: 'init' | 'push' | 'replace' | 'popstate'
-}
+router.route('/path', (params, to, from) => /* Do something ... */)
 ```
 
 You can handle the initial route differently (e.g.: no smooth scrolling):
