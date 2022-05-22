@@ -1,4 +1,4 @@
-# Very Simple Router
+# 📌 Very Simple Router
 
 A very simple dependency-free router written in typescript. You can use it to build
 lightweight SPAs or enhance your traditional multi page websites.
