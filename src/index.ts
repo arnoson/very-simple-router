@@ -1,5 +1,11 @@
 import { emit, off, on } from './events'
-import { Route, RouteAction, RouteDefinition, RouteTrigger } from './types'
+import {
+  Route,
+  RouteAction,
+  RouteDefinition,
+  RouteTrigger,
+  TypedRouteAction,
+} from './types'
 import { getParams, parsePattern, stripTrailingSlash } from './utils'
 
 const routeDefinitions: RouteDefinition[] = []
@@ -33,7 +39,7 @@ const handleChange = async (path: string, trigger: RouteTrigger) => {
   await emit('route', currentRoute, previousRoute)
 }
 
-export default {
+const router = {
   get currentRoute() {
     return currentRoute
   },
@@ -48,10 +54,15 @@ export default {
     )
   },
 
-  route(path: string, action: RouteAction) {
+  route<T extends string>(path: T, action: TypedRouteAction<T>) {
     const pattern = stripTrailingSlash(path)
     const { regExp, keys = [] } = parsePattern(path) || {}
-    routeDefinitions.push({ pattern, action, regExp, keys })
+    routeDefinitions.push({
+      pattern,
+      action: action as RouteAction,
+      regExp,
+      keys,
+    })
   },
 
   push(path: string) {
