@@ -34,6 +34,10 @@ const handleChange = async (path: string, trigger: RouteTrigger) => {
 }
 
 export default {
+  get currentRoute() {
+    return currentRoute
+  },
+
   on,
   off,
 
