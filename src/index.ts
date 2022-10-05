@@ -39,7 +39,7 @@ const handleChange = async (path: string, trigger: RouteTrigger) => {
   await emit('route', currentRoute, previousRoute)
 }
 
-const router = {
+export default {
   get currentRoute() {
     return currentRoute
   },
