@@ -7,6 +7,7 @@ import {
   TypedRouteAction,
 } from './types'
 import { getParams, parsePattern, stripTrailingSlash } from './utils'
+export * from './types'
 
 const routeDefinitions: RouteDefinition[] = []
 let currentRoute: Route | undefined
